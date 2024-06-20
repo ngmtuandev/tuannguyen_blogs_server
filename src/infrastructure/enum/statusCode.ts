@@ -1,0 +1,5 @@
+export enum STATUS_CODE {
+  SUCCESS = 200,
+  FAILURE = 400,
+  CREATED_SUCCESS = 201,
+}
