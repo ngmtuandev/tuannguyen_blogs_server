@@ -6,9 +6,16 @@ import { DatabaseModule } from './database';
 import { ConfigModule } from '@nestjs/config';
 import { AuthGuard, RolesGuard } from './domain/guard';
 import { APP_GUARD } from '@nestjs/core';
+import { MailerModule } from '@nestjs-modules/mailer';
 
+// TODO: FIX .ENV
 @Module({
-  imports: [ConfigModule.forRoot(), DatabaseModule, UserModule, AuthModule],
+  imports: [
+    ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
+    DatabaseModule,
+    UserModule,
+    AuthModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,

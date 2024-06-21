@@ -6,9 +6,21 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 
 async function bootstrap() {
+  const cookieParser = require('cookie-parser');
+  const session = require('express-session');
   dotenv.config();
 
   const app = await NestFactory.create(AppModule);
+
+  // TODO: FIX .ENV
+  app.use(cookieParser());
+  app.use(
+    session({
+      secret: '1111',
+      resave: false,
+      saveUninitialized: false,
+    }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Blogs TuanNguyen Service API')

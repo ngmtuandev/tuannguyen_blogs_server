@@ -3,11 +3,16 @@ import { IdDto } from 'src/common/dto';
 import { UserRepository } from 'src/database/repository';
 import { CreateUserDto, UserDto } from 'src/infrastructure/dto';
 import { XFunction } from 'src/infrastructure/xhelper';
+import { SendMailerService } from '../mailer';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly usersRepository: UserRepository) {}
-  async register(userInfo: CreateUserDto) {
+  constructor(
+    private readonly usersRepository: UserRepository,
+    private sendMailerService: SendMailerService,
+  ) {}
+
+  async register(req: any, userInfo: CreateUserDto) {
     let response = undefined;
 
     const findUserExisted = await this.usersRepository.findUserByEmail(
@@ -17,13 +22,28 @@ export class UserService {
 
     const passwordHasded = await XFunction.hashPassword(userInfo.password);
 
-    const userRegister = { ...userInfo, password: passwordHasded };
+    const data = { ...userInfo, password: passwordHasded };
 
-    const result = await this.usersRepository.create(userRegister);
-    if (result) {
-      response = XFunction.convertEntityTo(result, UserDto);
+    const codeConfirm = await this.sendMailerService.sendMailer(userInfo.email);
+    req.session.register = { code: codeConfirm, info: data };
+
+    if (codeConfirm) {
+      response = true;
     }
 
+    return response;
+  }
+
+  async confirm(req: any, code: any) {
+    let response = undefined;
+    const info = req.session.register;
+
+    if (+code === +info?.code) {
+      const result = await this.usersRepository.create(info?.info);
+      if (result) {
+        response = true;
+      }
+    }
     return response;
   }
 
