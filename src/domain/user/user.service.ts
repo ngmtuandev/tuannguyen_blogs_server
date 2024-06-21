@@ -1,9 +1,15 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { IdDto } from 'src/common/dto';
 import { UserRepository } from 'src/database/repository';
-import { CreateUserDto, UserDto } from 'src/infrastructure/dto';
+import {
+  CreateUserDto,
+  UpdatePasswordDto,
+  UpdateUserDto,
+  UserDto,
+} from 'src/infrastructure/dto';
 import { XFunction } from 'src/infrastructure/xhelper';
 import { SendMailerService } from '../mailer';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -27,9 +33,7 @@ export class UserService {
     const codeConfirm = await this.sendMailerService.sendMailer(userInfo.email);
     req.session.register = { code: codeConfirm, info: data };
 
-    if (codeConfirm) {
-      response = true;
-    }
+    if (codeConfirm) response = true;
 
     return response;
   }
@@ -49,7 +53,7 @@ export class UserService {
 
   async getDetail(id: IdDto) {
     let response = undefined;
-    const user = await this.usersRepository.findUserById(id);
+    const user = await this.usersRepository.findUserById(id.id);
 
     if (user) response = XFunction.convertEntityTo(user, UserDto);
     return response;
@@ -58,5 +62,48 @@ export class UserService {
   async delete(id: IdDto) {
     const result = await this.usersRepository.deleteUserById(id);
     return result;
+  }
+
+  async updatePassword(updateInfo: UpdatePasswordDto) {
+    let statusUpdate = undefined;
+    const findUserExisted = await this.usersRepository.findUserById(
+      updateInfo.id,
+    );
+
+    if (!findUserExisted) throw new BadRequestException();
+
+    const isMatchPassword = await bcrypt.compare(
+      updateInfo.password,
+      findUserExisted.password,
+    );
+
+    if (isMatchPassword) {
+      const newPasswordHasded = await XFunction.hashPassword(
+        updateInfo.newPassword,
+      );
+      await this.usersRepository.updatePasswordById(
+        updateInfo.id,
+        newPasswordHasded,
+      );
+      statusUpdate = true;
+    }
+
+    return statusUpdate;
+  }
+
+  async update(updateInfo: UpdateUserDto) {
+    let statusUpdate = undefined;
+    const findUserExisted = await this.usersRepository.findUserById(
+      updateInfo.id,
+    );
+
+    if (findUserExisted) {
+      const result = await this.usersRepository.updateUserById(
+        updateInfo.id,
+        updateInfo,
+      );
+      if (result) statusUpdate = true;
+    }
+    return statusUpdate;
   }
 }

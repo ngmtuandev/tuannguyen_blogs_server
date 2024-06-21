@@ -3,11 +3,17 @@ import {
   Controller,
   Delete,
   Get,
+  Patch,
   Post,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { CreateUserDto } from 'src/infrastructure/dto';
+import {
+  CreateUserDto,
+  UpdatePasswordDto,
+  UpdateUserDto,
+} from 'src/infrastructure/dto';
 import { UserService } from './user.service';
 import { ApiBadRequestResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { messageApi, Response } from 'src/common/constant';
@@ -84,6 +90,42 @@ export class UserController {
   }
 
   @ApiOperation({
+    summary: 'Api confirm email when register new users',
+  })
+  @ApiBadRequestResponse({ description: 'Confirm Register failure' })
+  @Patch('update-password')
+  async updatePassword(@Body() updateInfo: UpdatePasswordDto) {
+    try {
+      const result = await this.userService.updatePassword(updateInfo);
+      if (result) {
+        return new Response(
+          STATUS_CODE.SUCCESS,
+          undefined,
+          messageApi.SUCCESS,
+          undefined,
+          true,
+        );
+      }
+      return new Response(
+        STATUS_CODE.FAILURE,
+        undefined,
+        messageApi.FAIL,
+        undefined,
+        false,
+      );
+    } catch (error) {
+      return new Response(
+        STATUS_CODE.FAILURE,
+        null,
+        messageApi.FAIL,
+        undefined,
+        false,
+      );
+    }
+  }
+
+  @PublicAuth()
+  @ApiOperation({
     summary: 'Api get list user',
   })
   @ApiBadRequestResponse({ description: 'Get list user failure' })
@@ -118,6 +160,32 @@ export class UserController {
   async delete(@Body() id: IdDto) {
     try {
       await this.userService.delete(id);
+      return new Response(
+        STATUS_CODE.SUCCESS,
+        undefined,
+        messageApi.SUCCESS,
+        undefined,
+        true,
+      );
+    } catch (error) {
+      return new Response(
+        STATUS_CODE.FAILURE,
+        null,
+        messageApi.FAIL,
+        undefined,
+        false,
+      );
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Update one user by id',
+  })
+  @ApiBadRequestResponse({ description: 'Update user failure' })
+  @Put()
+  async update(@Body() updateUserDto: UpdateUserDto) {
+    try {
+      await this.userService.update(updateUserDto);
       return new Response(
         STATUS_CODE.SUCCESS,
         undefined,

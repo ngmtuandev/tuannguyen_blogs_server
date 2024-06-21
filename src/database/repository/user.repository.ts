@@ -1,7 +1,11 @@
 import { EntityTarget, Repository } from 'typeorm';
 import { GenericRepository } from './generic.repository';
 import { UserEntity } from '../entity';
-import { CreateUserDto } from 'src/infrastructure/dto';
+import {
+  CreateUserDto,
+  UpdatePasswordDto,
+  UpdateUserDto,
+} from 'src/infrastructure/dto';
 import { IdDto } from 'src/common/dto';
 
 export class UserRepository extends GenericRepository<UserEntity> {
@@ -21,14 +25,27 @@ export class UserRepository extends GenericRepository<UserEntity> {
     return result;
   }
 
-  async findUserById(id: IdDto) {
-    const result = await this.repository.findOne({ where: { id: id.id } });
+  async findUserById(id: number) {
+    const result = await this.repository.findOneBy({ id });
     return result;
   }
 
   async deleteUserById(id: IdDto) {
     const result = await this.repository.delete(id.id);
-    console.log('result delete : ', result);
+    return result;
+  }
+
+  async updatePasswordById(userId: number, password: string) {
+    const result = this.repository.update(userId, {
+      password: password,
+    });
+    return result;
+  }
+
+  async updateUserById(userId: number, updateInfo: UpdateUserDto) {
+    const result = this.repository.update(userId, {
+      ...updateInfo,
+    });
     return result;
   }
 }
