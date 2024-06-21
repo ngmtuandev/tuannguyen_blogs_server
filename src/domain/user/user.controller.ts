@@ -1,50 +1,95 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
 import { CreateUserDto } from 'src/infrastructure/dto';
 import { UserService } from './user.service';
 import { ApiBadRequestResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { messageApi, Response } from 'src/common/constant';
-import { STATUS_CODE } from 'src/infrastructure/enum';
+import { ROLE_CODE, STATUS_CODE } from 'src/infrastructure/enum';
+import { IdDto } from 'src/common/dto';
+import { AuthGuard } from '../guard';
+import { PublicAuth, Roles } from 'src/common/decorators';
 
 @ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @PublicAuth()
   @ApiOperation({
     summary: 'Api register new users',
   })
   @ApiBadRequestResponse({ description: 'Register failure' })
-  @Post()
+  @Post('register')
   async register(@Body() userInfo: CreateUserDto) {
-    let response = new Response(
-      STATUS_CODE.FAILURE,
-      undefined,
-      undefined,
-      undefined,
-      false,
-    );
-
     try {
       const result = await this.userService.register(userInfo);
-      response.data = result;
-      response.message = messageApi.SUCCESS;
-      response.status = true;
-      response.statusCode = STATUS_CODE.SUCCESS;
+      return new Response(
+        STATUS_CODE.SUCCESS,
+        result,
+        messageApi.SUCCESS,
+        undefined,
+        true,
+      );
     } catch (error) {
-      response.message = messageApi.FAIL;
-      response.status = false;
-      response.statusCode = STATUS_CODE.FAILURE;
+      return new Response(
+        STATUS_CODE.FAILURE,
+        null,
+        messageApi.FAIL,
+        undefined,
+        false,
+      );
     }
-    
-    return response;
   }
 
   @ApiOperation({
     summary: 'Api get list user',
   })
   @ApiBadRequestResponse({ description: 'Get list user failure' })
-  @Get()
-  async getAll() {
-    this.userService.getAll();
+  @Get('get-detail')
+  async getDetail(@Body() id: IdDto) {
+    try {
+      const result = await this.userService.getDetail(id);
+      return new Response(
+        STATUS_CODE.SUCCESS,
+        result,
+        messageApi.SUCCESS,
+        undefined,
+        true,
+      );
+    } catch (error) {
+      return new Response(
+        STATUS_CODE.FAILURE,
+        null,
+        messageApi.FAIL,
+        undefined,
+        false,
+      );
+    }
+  }
+
+  @Roles(ROLE_CODE.Admin)
+  @ApiOperation({
+    summary: 'Delete one user by id',
+  })
+  @ApiBadRequestResponse({ description: 'Delete user failure' })
+  @Delete()
+  async delete(@Body() id: IdDto) {
+    try {
+      await this.userService.delete(id);
+      return new Response(
+        STATUS_CODE.SUCCESS,
+        undefined,
+        messageApi.SUCCESS,
+        undefined,
+        true,
+      );
+    } catch (error) {
+      return new Response(
+        STATUS_CODE.FAILURE,
+        null,
+        messageApi.FAIL,
+        undefined,
+        false,
+      );
+    }
   }
 }

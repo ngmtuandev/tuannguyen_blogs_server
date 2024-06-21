@@ -7,7 +7,6 @@ import * as dotenv from 'dotenv';
 
 async function bootstrap() {
   dotenv.config();
-  console.log('DB_PASSWORD from env:', process.env.DB_PASSWORD, typeof process.env.DB_PASSWORD); 
 
   const app = await NestFactory.create(AppModule);
 

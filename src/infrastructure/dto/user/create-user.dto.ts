@@ -48,7 +48,7 @@ export class CreateUserDto {
   })
   @IsEnum(ROLE_CODE)
   @IsOptional()
-  role?: ROLE_CODE = ROLE_CODE.Client;
+  role?: ROLE_CODE | null = ROLE_CODE.Client;
 
   @ApiProperty({
     example: 'Province, where you from, social media',
@@ -60,5 +60,5 @@ export class CreateUserDto {
 
   @IsString()
   @IsOptional()
-  avatar: string 
+  avatar: string;
 }
