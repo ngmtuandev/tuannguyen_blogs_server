@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthGuard, RolesGuard } from './domain/guard';
 import { APP_GUARD } from '@nestjs/core';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { TagModule } from './domain/tag/tag.module';
 
 // TODO: FIX .ENV
 @Module({
@@ -15,6 +16,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
     DatabaseModule,
     UserModule,
     AuthModule,
+    TagModule
   ],
   controllers: [AppController],
   providers: [

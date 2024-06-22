@@ -6,10 +6,12 @@ export const XFunction = {
     const hash = await bcrypt.hash(password, saltOrRounds);
     return hash;
   },
+
   convertEntityTo: async function (entityClass: any, dto: any) {
     const dtoInstance = plainToClass(dto, entityClass);
     return classToPlain(dtoInstance, { excludeExtraneousValues: true });
   },
+
   generateTokenRandom: function () {
     const token = Math.floor(1000 + Math.random() * 9000).toString();
     return token;

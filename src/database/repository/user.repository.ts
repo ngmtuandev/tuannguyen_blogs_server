@@ -3,7 +3,6 @@ import { GenericRepository } from './generic.repository';
 import { UserEntity } from '../entity';
 import {
   CreateUserDto,
-  UpdatePasswordDto,
   UpdateUserDto,
 } from 'src/infrastructure/dto';
 import { IdDto } from 'src/common/dto';
