@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule, UserModule } from './domain';
+import { AuthModule, PostModule, UserModule } from './domain';
 import { DatabaseModule } from './database';
 import { ConfigModule } from '@nestjs/config';
 import { AuthGuard, RolesGuard } from './domain/guard';
@@ -16,7 +16,8 @@ import { TagModule } from './domain/tag/tag.module';
     DatabaseModule,
     UserModule,
     AuthModule,
-    TagModule
+    TagModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [

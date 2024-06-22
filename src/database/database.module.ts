@@ -1,6 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TagEntity, UserEntity } from './entity';
+import {
+  PostEntity,
+  PostTranslationEntity,
+  TagEntity,
+  UserEntity,
+} from './entity';
 
 // TODO: FIX .ENV
 @Module({
@@ -12,7 +17,7 @@ import { TagEntity, UserEntity } from './entity';
       username: 'postgres',
       password: 'Manhtuan123***',
       database: 'blog',
-      entities: [UserEntity, TagEntity],
+      entities: [UserEntity, TagEntity, PostEntity, PostTranslationEntity],
       synchronize: true,
     }),
   ],

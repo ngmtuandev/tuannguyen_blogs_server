@@ -1,19 +1,24 @@
 import { GenericEntity } from '../entity/generic.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { PaginationFilter } from 'src/common/dto';
-import { DataSource, EntityManager, EntityTarget, FindOneOptions, FindOptionsWhere, In, Like, Repository } from 'typeorm';
+import {
+  DataSource,
+  EntityManager,
+  EntityTarget,
+  FindOneOptions,
+  In,
+  Like,
+  Repository,
+} from 'typeorm';
 
 export abstract class GenericRepository<E extends GenericEntity> {
-
   protected repository: Repository<E>;
-
   protected entityManager: EntityManager;
 
   constructor(@InjectDataSource() protected xDs: DataSource) {
     this.repository = xDs.getRepository(this.getEntityType());
     this.entityManager = xDs.manager;
   }
-
 
   hasEntity(entity: E): boolean {
     let yes = false;
@@ -22,7 +27,6 @@ export abstract class GenericRepository<E extends GenericEntity> {
     }
     return yes;
   }
-
 
   async findOneByFieldName(fieldName: any): Promise<E> {
     return await this.repository.findOne({
@@ -78,18 +82,27 @@ export abstract class GenericRepository<E extends GenericEntity> {
     return Promise.resolve(false);
   }
 
-  async paginate({ page, limit, sort, sortBy, ...filters }: PaginationFilter, relations?: string[]) {
+  async paginate(
+    { page, limit, sort, sortBy, ...filters }: PaginationFilter,
+    relations?: string[],
+  ) {
     const entity = this.getEntityType();
     let skip = undefined;
     const take = limit;
     const where: Record<string, any> = {};
     const order: Record<string, any> = {};
 
-    const enumColumns = this.xDs.getMetadata(entity).ownColumns.filter((column) => column.type === 'enum');
+    const enumColumns = this.xDs
+      .getMetadata(entity)
+      .ownColumns.filter((column) => column.type === 'enum');
     const enumProperties = enumColumns.map((column) => column.propertyName);
 
-    const fkColumns = this.xDs.getMetadata(entity).relations.filter((column) => column.relationType == 'many-to-one');
-    const fkProperties = fkColumns.map((column) => column.joinColumns.map((item) => item.propertyName).join(', '));
+    const fkColumns = this.xDs
+      .getMetadata(entity)
+      .relations.filter((column) => column.relationType == 'many-to-one');
+    const fkProperties = fkColumns.map((column) =>
+      column.joinColumns.map((item) => item.propertyName).join(', '),
+    );
 
     Object.keys(filters).forEach((key) => {
       const value = filters[key];
@@ -120,9 +133,14 @@ export abstract class GenericRepository<E extends GenericEntity> {
     if (limit != undefined) {
       skip = limit * (page - 1);
     }
-    return await this.repository.findAndCount({ where, relations, skip, take, order });
+    return await this.repository.findAndCount({
+      where,
+      relations,
+      skip,
+      take,
+      order,
+    });
   }
-
 
   abstract getEntityType(): EntityTarget<E>;
 }
