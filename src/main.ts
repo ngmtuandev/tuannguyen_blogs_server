@@ -4,13 +4,18 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { ValidationError } from 'class-validator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
+import { MyLogger } from './common/logger';
 
 async function bootstrap() {
   const cookieParser = require('cookie-parser');
   const session = require('express-session');
   dotenv.config();
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new MyLogger(),
+  });
+
+  app.useLogger(app.get(MyLogger));
 
   // TODO: FIX .ENV
   app.use(cookieParser());

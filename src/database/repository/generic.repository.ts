@@ -1,25 +1,31 @@
 import { GenericEntity } from '../entity/generic.entity';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { PaginationFilter } from 'src/common/dto';
-import {
-  DataSource,
-  EntityManager,
-  EntityTarget,
-  FindOneOptions,
-  In,
-  Like,
-  Repository,
-} from 'typeorm';
+import { DataSource, EntityManager, EntityTarget, FindOneOptions, FindOptionsWhere, In, Like, Repository } from 'typeorm';
 
 export abstract class GenericRepository<E extends GenericEntity> {
+  /**
+   * TypeORM repository to handle the database actions
+   */
   protected repository: Repository<E>;
+
+  /**
+   * TypeOR entity manager to handle database query actions
+   */
   protected entityManager: EntityManager;
 
   constructor(@InjectDataSource() protected xDs: DataSource) {
+    /** Get repository with datasource from typeorm */
     this.repository = xDs.getRepository(this.getEntityType());
+    /** Get entity manager with datasource from typeorm */
     this.entityManager = xDs.manager;
   }
 
+  /**
+   * Verify database has entity or not
+   * @param entity E
+   * @returns
+   */
   hasEntity(entity: E): boolean {
     let yes = false;
     if (this.repository != undefined) {
@@ -28,6 +34,11 @@ export abstract class GenericRepository<E extends GenericEntity> {
     return yes;
   }
 
+  /**
+   * Find one item by any field
+   * @param fieldName any (string, datetime, ...)
+   * @returns Entity
+   */
   async findOneByFieldName(fieldName: any): Promise<E> {
     return await this.repository.findOne({
       where: { ...fieldName },
@@ -67,6 +78,9 @@ export abstract class GenericRepository<E extends GenericEntity> {
     return this.repository.save(entities);
   }
 
+  /**
+   * Delete item
+   */
   delete(id: number): Promise<boolean> {
     if (this.repository != undefined) {
       const retValue = this.repository
@@ -82,27 +96,20 @@ export abstract class GenericRepository<E extends GenericEntity> {
     return Promise.resolve(false);
   }
 
-  async paginate(
-    { page, limit, sort, sortBy, ...filters }: PaginationFilter,
-    relations?: string[],
-  ) {
+  async paginate({ page, limit, sort, sortBy, ...filters }: PaginationFilter, relations?: string[]) {
     const entity = this.getEntityType();
     let skip = undefined;
     const take = limit;
     const where: Record<string, any> = {};
     const order: Record<string, any> = {};
 
-    const enumColumns = this.xDs
-      .getMetadata(entity)
-      .ownColumns.filter((column) => column.type === 'enum');
+    /** get columns have type enum */
+    const enumColumns = this.xDs.getMetadata(entity).ownColumns.filter((column) => column.type === 'enum');
     const enumProperties = enumColumns.map((column) => column.propertyName);
 
-    const fkColumns = this.xDs
-      .getMetadata(entity)
-      .relations.filter((column) => column.relationType == 'many-to-one');
-    const fkProperties = fkColumns.map((column) =>
-      column.joinColumns.map((item) => item.propertyName).join(', '),
-    );
+    /** get columns are fk column */
+    const fkColumns = this.xDs.getMetadata(entity).relations.filter((column) => column.relationType == 'many-to-one');
+    const fkProperties = fkColumns.map((column) => column.joinColumns.map((item) => item.propertyName).join(', '));
 
     Object.keys(filters).forEach((key) => {
       const value = filters[key];
@@ -133,13 +140,7 @@ export abstract class GenericRepository<E extends GenericEntity> {
     if (limit != undefined) {
       skip = limit * (page - 1);
     }
-    return await this.repository.findAndCount({
-      where,
-      relations,
-      skip,
-      take,
-      order,
-    });
+    return await this.repository.findAndCount({ where, relations, skip, take, order });
   }
 
   abstract getEntityType(): EntityTarget<E>;

@@ -25,4 +25,8 @@ export class TagRepository extends GenericRepository<TagEntity> {
     const tagsResult = await this.repository.findOneBy({ id });
     return tagsResult;
   }
+
+  async findByIds(ids: any[]) {
+    return await this.repository.findByIds(ids);
+  }
 }

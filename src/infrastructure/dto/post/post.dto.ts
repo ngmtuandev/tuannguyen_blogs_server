@@ -10,4 +10,7 @@ export class PostDto {
 
   @IsOptional()
   thumbnail?: string | null = '';
+
+  @IsOptional()
+  tags?: any[];
 }
