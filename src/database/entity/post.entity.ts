@@ -3,15 +3,13 @@ import { GenericEntity } from './generic.entity';
 import { IsOptional } from 'class-validator';
 import { PostTranslationEntity } from './post-translation.entity';
 import { TagEntity } from './tag.entity';
+import { EmotionEntity } from './emotion.entity';
+import { PostEmotionEntity } from './post-emotion.entity';
 
 @Entity()
 export class PostEntity extends GenericEntity {
   @Column({ name: 'view' })
   view: number | null = 0;
-
-  @Column({ name: 'like' })
-  @IsOptional()
-  like?: number | null = 0;
 
   @Column({ name: 'thumbnail' })
   @IsOptional()
@@ -19,7 +17,7 @@ export class PostEntity extends GenericEntity {
 
   @Column({ name: 'is_delete' })
   @IsOptional()
-  isDelete: boolean | null = false
+  isDelete: boolean | null = false;
 
   @OneToMany(
     () => PostTranslationEntity,
@@ -29,4 +27,7 @@ export class PostEntity extends GenericEntity {
 
   @ManyToMany(() => TagEntity, (tag) => tag.posts)
   tags?: TagEntity[];
+
+  @OneToMany(() => PostEmotionEntity, postEmotion => postEmotion.post)
+  postEmotions: PostEmotionEntity[];
 }

@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
+  EmotionEntity,
+  PostEmotionEntity,
   PostEntity,
   PostTranslationEntity,
   TagEntity,
@@ -17,7 +19,14 @@ import {
       username: 'postgres',
       password: 'Manhtuan123***',
       database: 'blog',
-      entities: [UserEntity, TagEntity, PostEntity, PostTranslationEntity],
+      entities: [
+        UserEntity,
+        TagEntity,
+        PostEntity,
+        PostTranslationEntity,
+        EmotionEntity,
+        PostEmotionEntity,
+      ],
       synchronize: true,
     }),
   ],
