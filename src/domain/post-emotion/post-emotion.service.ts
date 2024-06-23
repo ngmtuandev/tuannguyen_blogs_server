@@ -7,8 +7,8 @@ export class PostEmotionService {
   constructor(private readonly postEmotionRepository: PostEmotionRepository) {}
 
   async create(postEmotionInfo: CreatePostEmotionDto, req: any) {
-    const data = { ...postEmotionInfo, user: req.userInfo.sub };
-    const result = this.postEmotionRepository.create(data);
+    const dataPostEmotionInfo = { ...postEmotionInfo, user: req.userInfo.sub };
+    const result = this.postEmotionRepository.create(dataPostEmotionInfo);
     return result;
   }
 

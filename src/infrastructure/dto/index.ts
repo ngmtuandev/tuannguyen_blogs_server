@@ -25,3 +25,9 @@ export * from './emotion/emotion.dto';
 
 // POST EMOTION
 export * from './post-emotion/create-post-emotion.dto';
+
+// COMMENT
+export * from './comment/create-comment.dto';
+export * from './comment/comment.dto';
+export * from './comment/update-comment.dto';
+export * from './comment/find-comment.dto';

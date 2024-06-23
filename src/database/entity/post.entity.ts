@@ -5,6 +5,7 @@ import { PostTranslationEntity } from './post-translation.entity';
 import { TagEntity } from './tag.entity';
 import { EmotionEntity } from './emotion.entity';
 import { PostEmotionEntity } from './post-emotion.entity';
+import { CommentEntity } from './comment.entity';
 
 @Entity()
 export class PostEntity extends GenericEntity {
@@ -30,4 +31,7 @@ export class PostEntity extends GenericEntity {
 
   @OneToMany(() => PostEmotionEntity, postEmotion => postEmotion.post)
   postEmotions: PostEmotionEntity[];
+
+  @OneToMany(() => CommentEntity, (comment) => comment.post)
+  comment: CommentEntity;
 }

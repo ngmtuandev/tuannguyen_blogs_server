@@ -1,8 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn, IsNull, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  IsNull,
+  OneToMany,
+} from 'typeorm';
 import { GenericEntity } from './generic.entity';
 import { ROLE_CODE } from 'src/infrastructure/enum';
-import { EmotionEntity } from './emotion.entity';
 import { PostEmotionEntity } from './post-emotion.entity';
+import { CommentEntity } from './comment.entity';
 
 @Entity()
 export class UserEntity extends GenericEntity {
@@ -24,7 +30,9 @@ export class UserEntity extends GenericEntity {
   @Column()
   password: string;
 
-  @OneToMany(() => PostEmotionEntity, postEmotion => postEmotion.user)
+  @OneToMany(() => PostEmotionEntity, (postEmotion) => postEmotion.user)
   postEmotions: PostEmotionEntity[];
 
+  @OneToMany(() => CommentEntity, (comment) => comment.user)
+  comment: CommentEntity;
 }

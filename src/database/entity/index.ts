@@ -5,3 +5,4 @@ export * from './post.entity';
 export * from './post-translation.entity';
 export * from './emotion.entity';
 export * from './post-emotion.entity';
+export * from './comment.entity';

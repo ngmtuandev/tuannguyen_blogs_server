@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import {
+  CommentEntity,
   EmotionEntity,
   PostEmotionEntity,
   PostEntity,
@@ -26,6 +27,7 @@ import {
         PostTranslationEntity,
         EmotionEntity,
         PostEmotionEntity,
+        CommentEntity
       ],
       synchronize: true,
     }),

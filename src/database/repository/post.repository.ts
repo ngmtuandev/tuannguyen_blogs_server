@@ -121,4 +121,9 @@ export class PostRepository extends GenericRepository<PostEntity> {
       await this.repository.update(id, { view: post.view + 1 });
     }
   }
+
+  async findByIdNotLanguage(id: number) {
+    const result = await this.repository.findOneBy({ id });
+    return result;
+  }
 }

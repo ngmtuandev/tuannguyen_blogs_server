@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {
   AuthModule,
+  CommentModule,
   EmotionModule,
   PostEmotionModule,
   PostModule,
@@ -27,6 +28,7 @@ import { LoggerModule } from './common/logger';
     PostModule,
     EmotionModule,
     PostEmotionModule,
+    CommentModule
   ],
   controllers: [AppController],
   providers: [
