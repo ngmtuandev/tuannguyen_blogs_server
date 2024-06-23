@@ -1,7 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule, EmotionModule, PostModule, UserModule } from './domain';
+import {
+  AuthModule,
+  EmotionModule,
+  PostEmotionModule,
+  PostModule,
+  UserModule,
+} from './domain';
 import { DatabaseModule } from './database';
 import { ConfigModule } from '@nestjs/config';
 import { AuthGuard, RolesGuard } from './domain/guard';
@@ -19,7 +25,8 @@ import { LoggerModule } from './common/logger';
     AuthModule,
     TagModule,
     PostModule,
-    EmotionModule
+    EmotionModule,
+    PostEmotionModule,
   ],
   controllers: [AppController],
   providers: [

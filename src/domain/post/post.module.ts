@@ -11,7 +11,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   controllers: [PostController],
-  providers: [PostService, PostRepository, PostTranslationRepository, TagRepository],
+  providers: [
+    PostService,
+    PostRepository,
+    PostTranslationRepository,
+    TagRepository,
+  ],
   imports: [TypeOrmModule.forFeature([PostEntity, PostTranslationEntity])],
   exports: [],
 })

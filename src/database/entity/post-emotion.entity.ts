@@ -2,11 +2,10 @@ import { Entity, Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { PostEntity } from './post.entity';
 import { EmotionEntity } from './emotion.entity';
 import { UserEntity } from './user.entity';
+import { GenericEntity } from './generic.entity';
 
 @Entity('post_emotions')
-export class PostEmotionEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class PostEmotionEntity extends GenericEntity {
 
   @ManyToOne(() => PostEntity, post => post.postEmotions)
   post: PostEntity;

@@ -108,8 +108,17 @@ export class PostRepository extends GenericRepository<PostEntity> {
       LEFT JOIN tag_post tp ON tp.post_id = p.id 
       WHERE p.id = ${id} AND p.is_delete IS false AND pt.language_code LIKE '${language}'
     `;
+
+    await this.updateView(id);
+
     const results = await this.repository.query(query);
     return results;
   }
 
+  async updateView(id: number) {
+    const post = await this.repository.findOneBy({ id });
+    if (post) {
+      await this.repository.update(id, { view: post.view + 1 });
+    }
+  }
 }

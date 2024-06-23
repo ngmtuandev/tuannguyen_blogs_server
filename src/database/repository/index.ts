@@ -4,3 +4,4 @@ export * from './tag.repository';
 export * from './post.repository';
 export * from './post.translation.repository';
 export * from './emotion.repository';
+export * from './post-emotion.repository';

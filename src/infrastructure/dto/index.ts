@@ -22,3 +22,6 @@ export * from './post/update-post-translation.dto';
 // EMOTION
 export * from './emotion/create-emotion.dto';
 export * from './emotion/emotion.dto';
+
+// POST EMOTION
+export * from './post-emotion/create-post-emotion.dto';
