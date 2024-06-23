@@ -2,7 +2,6 @@ import { EntityManager, EntityTarget, Repository } from 'typeorm';
 import { GenericRepository } from './generic.repository';
 import { PostEntity } from '../entity';
 import { FindPostDto, PostDto } from 'src/infrastructure/dto';
-import { LANGUAGE_CODE } from 'src/infrastructure/enum';
 import { PaginationInfinityDto } from 'src/common/dto';
 import { Logger } from '@nestjs/common';
 
@@ -95,4 +94,22 @@ export class PostRepository extends GenericRepository<PostEntity> {
       throw new Error('Executing the query failure.');
     }
   }
+
+  async findById(id: number, language: string) {
+    let query = `
+      SELECT DISTINCT ON (p.id)  p.*, 
+      pt.id AS post_translation_id, 
+      pt.content, 
+      pt.title, 
+      pt.content_description, 
+      pt.language_code, 
+      tp.tag_id FROM post_entity p 
+      LEFT JOIN post_translation_entity pt ON p.id = pt."postId"
+      LEFT JOIN tag_post tp ON tp.post_id = p.id 
+      WHERE p.id = ${id} AND p.is_delete IS false AND pt.language_code LIKE '${language}'
+    `;
+    const results = await this.repository.query(query);
+    return results;
+  }
+
 }

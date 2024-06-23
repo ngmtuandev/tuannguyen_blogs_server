@@ -16,3 +16,5 @@ export * from './post/create-post-translation-en.dto';
 export * from './post/create-post-translation-vi.dto';
 export * from './post/post.dto';
 export * from './post/find-post.dto';
+export * from './post/post-response.dto';
+export * from './post/update-post-translation.dto';

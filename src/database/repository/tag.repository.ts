@@ -2,7 +2,6 @@ import { EntityTarget, Repository } from 'typeorm';
 import { GenericRepository } from './generic.repository';
 import { TagEntity } from '../entity';
 import { CreateTagDto } from 'src/infrastructure/dto';
-import { PaginationFilter } from 'src/common/dto';
 
 export class TagRepository extends GenericRepository<TagEntity> {
   protected repository: Repository<TagEntity>;

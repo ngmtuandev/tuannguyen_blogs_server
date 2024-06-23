@@ -4,25 +4,18 @@ import { PaginationFilter } from 'src/common/dto';
 import { DataSource, EntityManager, EntityTarget, FindOneOptions, FindOptionsWhere, In, Like, Repository } from 'typeorm';
 
 export abstract class GenericRepository<E extends GenericEntity> {
-  /**
-   * TypeORM repository to handle the database actions
-   */
+ 
   protected repository: Repository<E>;
 
-  /**
-   * TypeOR entity manager to handle database query actions
-   */
+
   protected entityManager: EntityManager;
 
   constructor(@InjectDataSource() protected xDs: DataSource) {
-    /** Get repository with datasource from typeorm */
     this.repository = xDs.getRepository(this.getEntityType());
-    /** Get entity manager with datasource from typeorm */
     this.entityManager = xDs.manager;
   }
 
   /**
-   * Verify database has entity or not
    * @param entity E
    * @returns
    */
@@ -35,8 +28,7 @@ export abstract class GenericRepository<E extends GenericEntity> {
   }
 
   /**
-   * Find one item by any field
-   * @param fieldName any (string, datetime, ...)
+   * @param fieldName any (string, ...)
    * @returns Entity
    */
   async findOneByFieldName(fieldName: any): Promise<E> {
@@ -60,7 +52,6 @@ export abstract class GenericRepository<E extends GenericEntity> {
   }
 
   /**
-   * Save item to database
    * @param entity E
    * @returns Entity
    */
@@ -68,9 +59,7 @@ export abstract class GenericRepository<E extends GenericEntity> {
     return this.repository.save(entity);
   }
 
-  // save multi
   /**
-   * Save multiple items to database
    * @param entities E[]
    * @returns Entity[]
    */
@@ -103,11 +92,9 @@ export abstract class GenericRepository<E extends GenericEntity> {
     const where: Record<string, any> = {};
     const order: Record<string, any> = {};
 
-    /** get columns have type enum */
     const enumColumns = this.xDs.getMetadata(entity).ownColumns.filter((column) => column.type === 'enum');
     const enumProperties = enumColumns.map((column) => column.propertyName);
 
-    /** get columns are fk column */
     const fkColumns = this.xDs.getMetadata(entity).relations.filter((column) => column.relationType == 'many-to-one');
     const fkProperties = fkColumns.map((column) => column.joinColumns.map((item) => item.propertyName).join(', '));
 

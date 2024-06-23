@@ -12,7 +12,6 @@ async function bootstrap() {
   dotenv.config();
 
   const app = await NestFactory.create(AppModule, {
-    logger: new MyLogger(),
   });
 
   app.useLogger(app.get(MyLogger));

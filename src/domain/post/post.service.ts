@@ -8,10 +8,13 @@ import {
   CreatePostTranslationDto,
   FindPostDto,
   PostDto,
+  PostResponseDto,
+  UpdatePostTranslationDto,
 } from 'src/infrastructure/dto';
 import { DataSource } from 'typeorm';
 import { PostEntity, PostTranslationEntity } from 'src/database/entity';
 import { plainToClass } from 'class-transformer';
+import { XFunction } from 'src/infrastructure/xhelper';
 
 @Injectable()
 export class PostService {
@@ -59,7 +62,6 @@ export class PostService {
         postTransVi,
       );
 
-      // throw new Error()  -> OK
       await queryRunner.commitTransaction();
 
       response = true;
@@ -81,5 +83,28 @@ export class PostService {
     const result = await this.postRepository.findAllFilter(findInfo);
     this.logger.log(result);
     return result;
+  }
+
+  async findById(id: number, language: string) {
+    const resultEntity = await this.postRepository.findById(id, language);
+
+    const resultConvertToDto = XFunction.convertEntityTo(
+      resultEntity,
+      PostResponseDto,
+    );
+    return resultConvertToDto;
+  }
+
+  async updateById(postTransId: number, updateInfo: UpdatePostTranslationDto) {
+    let response = undefined;
+    const findPostUpdate = this.postTranslationRepository.findById(postTransId);
+    if (findPostUpdate) {
+      const updatePost = this.postTranslationRepository.updateById(
+        postTransId,
+        updateInfo,
+      );
+      if (updatePost) response = true;
+    }
+    return response;
   }
 }
