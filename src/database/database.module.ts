@@ -6,6 +6,7 @@ import {
   PostEmotionEntity,
   PostEntity,
   PostTranslationEntity,
+  SessionCodeEntity,
   TagEntity,
   UserEntity,
 } from './entity';
@@ -27,7 +28,8 @@ import {
         PostTranslationEntity,
         EmotionEntity,
         PostEmotionEntity,
-        CommentEntity
+        CommentEntity,
+        SessionCodeEntity,
       ],
       synchronize: true,
     }),

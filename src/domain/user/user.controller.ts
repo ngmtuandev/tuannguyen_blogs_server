@@ -7,6 +7,7 @@ import {
   Post,
   Put,
   Req,
+  Session,
 } from '@nestjs/common';
 import {
   CreateUserDto,
@@ -31,9 +32,9 @@ export class UserController {
   })
   @ApiBadRequestResponse({ description: 'Register failure' })
   @Post('register')
-  async register(@Req() req: any, @Body() userInfo: CreateUserDto) {
+  async register(@Body() userInfo: CreateUserDto) {
     try {
-      const result = await this.userService.register(req, userInfo);
+      const result = await this.userService.register(userInfo);
       return new Response(
         STATUS_CODE.SUCCESS,
         result,
@@ -58,9 +59,11 @@ export class UserController {
   })
   @ApiBadRequestResponse({ description: 'Confirm Register failure' })
   @Post('confirm')
-  async confirm(@Req() req: any, @Body('code') code: any) {
+  async confirm(
+    @Body('code') code: any,
+  ) {
     try {
-      const result = await this.userService.confirm(req, code);
+      const result = await this.userService.confirm(code);
       if (result) {
         return new Response(
           STATUS_CODE.SUCCESS,

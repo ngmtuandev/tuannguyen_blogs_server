@@ -6,3 +6,4 @@ export * from './post-translation.entity';
 export * from './emotion.entity';
 export * from './post-emotion.entity';
 export * from './comment.entity';
+export * from './session-code.entity';

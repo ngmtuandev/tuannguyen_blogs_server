@@ -1,7 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { IdDto } from 'src/common/dto';
-import { UserRepository } from 'src/database/repository';
+import { SessionCodeRepository, UserRepository } from 'src/database/repository';
 import {
+  CreateSessionCodeDto,
   CreateUserDto,
   UpdatePasswordDto,
   UpdateUserDto,
@@ -10,15 +11,17 @@ import {
 import { XFunction } from 'src/infrastructure/xhelper';
 import { SendMailerService } from '../mailer';
 import * as bcrypt from 'bcrypt';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly usersRepository: UserRepository,
     private sendMailerService: SendMailerService,
+    private readonly sessionCodeRepository: SessionCodeRepository,
   ) {}
 
-  async register(req: any, userInfo: CreateUserDto) {
+  async register(userInfo: CreateUserDto) {
     let response = undefined;
 
     const findUserExisted = await this.usersRepository.findUserByEmail(
@@ -31,21 +34,29 @@ export class UserService {
     const data = { ...userInfo, password: passwordHasded };
 
     const codeConfirm = await this.sendMailerService.sendMailer(userInfo.email);
-    req.session.register = { code: codeConfirm, info: data };
+    const dataSessionCode = plainToClass(CreateSessionCodeDto, {
+      code: codeConfirm,
+      data: JSON.stringify(data),
+    });
+    const dataSession =
+      await this.sessionCodeRepository.createSession(dataSessionCode);
 
-    if (codeConfirm) response = true;
+    if (codeConfirm && dataSession) response = true;
 
     return response;
   }
 
-  async confirm(req: any, code: any) {
-    let response = undefined;
-    const info = req.session.register;
+  async confirm(code: any) {
+    const dataInSession = await this.sessionCodeRepository.findSession(code);
 
-    if (+code === +info?.code) {
-      const result = await this.usersRepository.create(info?.info);
+    let response = undefined;
+    const info = await JSON.parse(dataInSession?.data);
+
+    if (+code === +dataInSession?.code) {
+      const result = await this.usersRepository.create(info);
       if (result) {
         response = true;
+        await this.sessionCodeRepository.deleteSession(dataInSession.id);
       }
     }
     return response;

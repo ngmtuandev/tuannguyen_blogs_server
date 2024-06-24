@@ -7,7 +7,7 @@ export abstract class GenericEntity extends BaseEntity {
     @Column('int', { name: 'active', nullable: true, default: 1 })
     createdBy?: string | null;
 
-    @Column('date', {
+    @Column('timestamp', {
         name: 'created_at',
         default: () => 'CURRENT_TIMESTAMP',
         nullable: true
