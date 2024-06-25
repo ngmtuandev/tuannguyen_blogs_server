@@ -6,8 +6,7 @@ import {
   Patch,
   Post,
   Put,
-  Req,
-  Session,
+  Request,
 } from '@nestjs/common';
 import {
   CreateUserDto,
@@ -59,9 +58,7 @@ export class UserController {
   })
   @ApiBadRequestResponse({ description: 'Confirm Register failure' })
   @Post('confirm')
-  async confirm(
-    @Body('code') code: any,
-  ) {
+  async confirm(@Body('code') code: any) {
     try {
       const result = await this.userService.confirm(code);
       if (result) {
@@ -69,6 +66,41 @@ export class UserController {
           STATUS_CODE.SUCCESS,
           undefined,
           messageApi.SUCCESS,
+          undefined,
+          true,
+        );
+      }
+      return new Response(
+        STATUS_CODE.FAILURE,
+        undefined,
+        messageApi.FAIL,
+        undefined,
+        false,
+      );
+    } catch (error) {
+      return new Response(
+        STATUS_CODE.FAILURE,
+        null,
+        messageApi.FAIL,
+        undefined,
+        false,
+      );
+    }
+  }
+
+  @ApiOperation({
+    summary: 'Api info users current',
+  })
+  @ApiBadRequestResponse({ description: 'Get User failure' })
+  @Get('info-current')
+  async findInfoCurrent(@Request() req: Request) {
+    try {
+      const result = await this.userService.findCurrent(req);
+      if (result) {
+        return new Response(
+          STATUS_CODE.SUCCESS,
+          messageApi.SUCCESS,
+          result,
           undefined,
           true,
         );

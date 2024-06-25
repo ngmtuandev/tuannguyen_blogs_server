@@ -5,7 +5,6 @@ import { ValidationError } from 'class-validator';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as dotenv from 'dotenv';
 import { MyLogger } from './common/logger';
-import { MemoryStore } from 'express-session';
 
 async function bootstrap() {
   const cookieParser = require('cookie-parser');

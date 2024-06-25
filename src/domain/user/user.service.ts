@@ -117,4 +117,10 @@ export class UserService {
     }
     return statusUpdate;
   }
+
+  async findCurrent(req: any) {
+    const idUser = req?.userInfo?.sub;
+    const infoCurrent = await this.usersRepository.findUserById(idUser);
+    return XFunction.convertEntityTo(infoCurrent, UserDto);
+  }
 }
