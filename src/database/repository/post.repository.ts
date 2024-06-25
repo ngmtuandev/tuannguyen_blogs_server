@@ -60,9 +60,9 @@ export class PostRepository extends GenericRepository<PostEntity> {
             pt.language_code AS languageCode, 
             t.id AS tagId, 
             t.name AS tagName,
-            pe.emotion_1_count,
-            pe.emotion_2_count,
-            pe.emotion_3_count
+            pe.emotion_1_count AS like,
+            pe.emotion_2_count AS good,
+            pe.emotion_3_count AS great
         FROM 
             public.post_entity p
         LEFT JOIN 
