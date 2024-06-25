@@ -90,7 +90,7 @@ export class PostController {
   }
 
   @PublicAuth()
-  @Get('find-all')
+  @Post('find-all')
   async findAllFilter(@Body() findInfo: FindPostDto) {
     try {
       const result = await this.postService.findAllFilter(findInfo);

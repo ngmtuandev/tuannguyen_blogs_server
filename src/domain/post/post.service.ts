@@ -81,7 +81,6 @@ export class PostService {
 
   async findAllFilter(findInfo: FindPostDto) {
     const result = await this.postRepository.findAllFilter(findInfo);
-    this.logger.log(result);
     return result;
   }
 
