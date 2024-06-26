@@ -9,7 +9,7 @@ import {
   PostModule,
   UserModule,
 } from './domain';
-import { DatabaseModule } from './database';
+import { DatabaseModule, RedisModule } from './database';
 import { ConfigModule } from '@nestjs/config';
 import { AuthGuard, RolesGuard } from './domain/guard';
 import { APP_GUARD } from '@nestjs/core';
@@ -25,6 +25,7 @@ import { SessionCodeRepository } from './database/repository';
     ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
     LoggerModule,
     DatabaseModule,
+    RedisModule,
     UserModule,
     AuthModule,
     TagModule,
@@ -32,7 +33,7 @@ import { SessionCodeRepository } from './database/repository';
     EmotionModule,
     PostEmotionModule,
     CommentModule,
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [

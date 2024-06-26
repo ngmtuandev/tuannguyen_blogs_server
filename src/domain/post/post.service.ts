@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import {
   PostRepository,
   PostTranslationRepository,
@@ -15,6 +15,8 @@ import { DataSource } from 'typeorm';
 import { PostEntity, PostTranslationEntity } from 'src/database/entity';
 import { plainToClass } from 'class-transformer';
 import { XFunction } from 'src/infrastructure/xhelper';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class PostService {
@@ -24,6 +26,7 @@ export class PostService {
     private readonly postRepository: PostRepository,
     private readonly postTranslationRepository: PostTranslationRepository,
     private readonly tagRepository: TagRepository,
+    @Inject(CACHE_MANAGER) private cacheService: Cache,
   ) {}
 
   async create(postInfo: PostDto, postTransInfo: CreatePostTranslationDto) {
@@ -80,12 +83,36 @@ export class PostService {
   }
 
   async findAllFilter(findInfo: FindPostDto) {
+    const gerenateNetwork = XFunction.gererateIpNetworkForRedis();
+
+    const keyRedis = `${gerenateNetwork[0]}_${findInfo.languageCode}_${findInfo.limit}_${findInfo.page}_${findInfo.tagsId + findInfo.title}`;
+
+    const cachedData = await this.cacheService.get(keyRedis);
+
+    if (cachedData) return cachedData;
+
     const result = await this.postRepository.findAllFilter(findInfo);
+
+    await this.cacheService.set(keyRedis, result, 10);
+
     return result;
   }
 
   async findById(id: number, language: string) {
+    const gerenateNetwork = XFunction.gererateIpNetworkForRedis();
     const resultEntity = await this.postRepository.findById(id, language);
+
+    const keyRedis = `${gerenateNetwork[0]}_${id}`;
+
+    const cachedData = await this.cacheService.get(keyRedis);
+
+    if (cachedData) {
+      const resultConvertToDto = XFunction.convertEntityTo(
+        cachedData,
+        PostResponseDto,
+      );
+      return resultConvertToDto;
+    }
 
     const resultConvertToDto = XFunction.convertEntityTo(
       resultEntity,
