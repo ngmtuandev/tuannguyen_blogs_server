@@ -1,16 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { plainToClass } from 'class-transformer';
 import { CommentEntity } from 'src/database/entity';
 import {
   CommentRepository,
+  NotificationRepository,
   PostRepository,
   UserRepository,
 } from 'src/database/repository';
 import {
   CommentDto,
   CreateCommentDto,
+  CreateNotificationDto,
   FindCommentDto,
   UpdateCommentDto,
 } from 'src/infrastructure/dto';
+import { DataSource, QueryRunner } from 'typeorm';
 
 @Injectable()
 export class CommentService {
@@ -18,26 +22,74 @@ export class CommentService {
     private readonly commentRepository: CommentRepository,
     private readonly userRepository: UserRepository,
     private readonly postRepository: PostRepository,
+    private readonly notificationRepository: NotificationRepository,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(commentInfo: CreateCommentDto, req: any) {
-    const user = await this.userRepository.findUserById(req.userInfo.sub);
-    const post = await this.postRepository.findByIdNotLanguage(
-      commentInfo?.post,
-    );
+    const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
-    const parentId = commentInfo?.parentId || 0;
+    try {
+      const user = await this.userRepository.findUserById(req.userInfo.sub);
+      if (!user) {
+        throw new BadRequestException('User not found');
+      }
 
-    const newComment = Object.assign(new CommentEntity(), {
-      ...commentInfo,
-      parentId,
-      user,
-      post,
-    });
+      const post = await this.postRepository.findByIdNotLanguage(
+        commentInfo.post,
+      );
+      if (!post) {
+        throw new BadRequestException('Post not found');
+      }
 
-    const result = await this.commentRepository.create(newComment);
-    const resultConvertDto = this.toCommentDto(result);
-    return resultConvertDto;
+      const parentId = commentInfo?.parentId || 0;
+
+      const newComment = queryRunner.manager.create(CommentEntity, {
+        ...commentInfo,
+        parentId,
+        user,
+        post,
+      });
+
+      const result = await this.commentRepository.create(
+        queryRunner.manager,
+        newComment,
+      );
+
+      const findComment =
+        await this.commentRepository.findCommentById(parentId);
+
+      if (
+        parentId !== 0 &&
+        findComment &&
+        findComment.user.id != req.userInfo.sub
+      ) {
+        const notificationInfo = plainToClass(CreateNotificationDto, {
+          message: `Bạn có thông báo từ ${user.email} của bài đăng ${post.id}`,
+          user: findComment.user,
+          comment: findComment,
+          postId: post.id
+        });
+
+        await this.notificationRepository.create(
+          queryRunner.manager,
+          notificationInfo,
+        );
+        // throw Error();
+      }
+
+      await queryRunner.commitTransaction();
+
+      const resultConvertDto = this.toCommentDto(result);
+      return resultConvertDto;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw new BadRequestException('Failed to create comment');
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   async findCommentOfPost(findCommentInfo: FindCommentDto) {
@@ -66,17 +118,18 @@ export class CommentService {
   }
 
   async likeCommentById(commentId: number) {
-    return await this.commentRepository.likeCommentById(commentId);
+    const response = await this.commentRepository.likeCommentById(commentId);
+    return response;
   }
 
   async deleteById(commentId: number) {
     const result = await this.commentRepository.deleteRecursive(commentId);
+    return result;
   }
 
   async updateById(updateCommentInfo: UpdateCommentDto, req: any) {
     const dataUpdate = { ...updateCommentInfo, userId: req.userInfo.sub };
-    const result =
-      await this.commentRepository.updateCommentById(dataUpdate);
+    const result = await this.commentRepository.updateCommentById(dataUpdate);
     return result;
   }
 }

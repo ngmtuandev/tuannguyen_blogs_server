@@ -139,15 +139,38 @@ export class PostRepository extends GenericRepository<PostEntity> {
 
   async findById(id: number, language: string) {
     let query = `
-      SELECT DISTINCT ON (p.id)  p.*, 
-      pt.id AS post_translation_id, 
-      pt.content, 
-      pt.title, 
-      pt.content_description, 
-      pt.language_code, 
-      tp.tag_id FROM post_entity p 
+            SELECT DISTINCT ON (p.id) 
+          p.*, 
+          pt.id AS post_translation_id, 
+          pt.content, 
+          pt.title, 
+          pt.content_description, 
+          pt.language_code, 
+          tp.tag_id,
+          pe.emotion_1_count AS like,
+          pe.emotion_2_count AS good,
+          pe.emotion_3_count AS great
+      FROM post_entity p 
       LEFT JOIN post_translation_entity pt ON p.id = pt."postId"
       LEFT JOIN tag_post tp ON tp.post_id = p.id 
+      LEFT JOIN (
+          SELECT 
+              e.post,
+              MAX(CASE WHEN e.emotion = 1 THEN e.emotion_count ELSE 0 END) AS emotion_1_count,
+              MAX(CASE WHEN e.emotion = 2 THEN e.emotion_count ELSE 0 END) AS emotion_2_count,
+              MAX(CASE WHEN e.emotion = 3 THEN e.emotion_count ELSE 0 END) AS emotion_3_count
+          FROM (
+              SELECT 
+                  pe."postId" AS post, 
+                  pe."emotionId" AS emotion, 
+                  COUNT(pe."emotionId") AS emotion_count
+              FROM 
+                  public.post_emotions pe
+              GROUP BY 
+                  pe."postId", pe."emotionId"
+          ) e
+          GROUP BY e.post
+      ) pe ON pe.post = p.id
       WHERE p.id = ${id} AND p.is_delete IS false AND pt.language_code LIKE '${language}'
     `;
 

@@ -9,6 +9,7 @@ import { GenericEntity } from './generic.entity';
 import { ROLE_CODE } from 'src/infrastructure/enum';
 import { PostEmotionEntity } from './post-emotion.entity';
 import { CommentEntity } from './comment.entity';
+import { NotificationEntity } from './notification.entity';
 
 @Entity()
 export class UserEntity extends GenericEntity {
@@ -35,4 +36,7 @@ export class UserEntity extends GenericEntity {
 
   @OneToMany(() => CommentEntity, (comment) => comment.user)
   comment: CommentEntity;
+
+  @OneToMany(() => NotificationEntity, notification => notification.user)
+  notifications: NotificationEntity[];
 }

@@ -7,3 +7,4 @@ export * from './emotion.repository';
 export * from './post-emotion.repository';
 export * from './comment.repository';
 export * from './session-code.repository';
+export * from './notification.repository';

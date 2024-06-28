@@ -35,3 +35,6 @@ export * from './comment/find-comment.dto';
 // SESSION CODE
 export * from './session-code/create-session-code.dto';
 export * from './session-code/find-session-code.dto';
+
+// NOTIFICATION
+export * from './notification/create-notification.dto';

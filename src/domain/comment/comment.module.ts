@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { CommentController } from './comment.controller';
 import {
   CommentRepository,
+  NotificationRepository,
   PostRepository,
   UserRepository,
 } from 'src/database/repository';
@@ -13,6 +14,7 @@ import { CommentService } from './comment.service';
     CommentService,
     UserRepository,
     PostRepository,
+    NotificationRepository,
   ],
   controllers: [CommentController],
   exports: [],

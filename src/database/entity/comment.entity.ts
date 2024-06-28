@@ -3,6 +3,7 @@ import { GenericEntity } from './generic.entity';
 import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { UserEntity } from './user.entity';
 import { PostEntity } from './post.entity';
+import { NotificationEntity } from './notification.entity';
 
 @Entity()
 export class CommentEntity extends GenericEntity {
@@ -22,4 +23,7 @@ export class CommentEntity extends GenericEntity {
 
   @ManyToOne(() => PostEntity, (post) => post.comment)
   post: PostEntity;
+
+  @OneToMany(() => NotificationEntity, (notification) => notification.comment)
+  notifications: NotificationEntity[];
 }

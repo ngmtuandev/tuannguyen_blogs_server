@@ -83,36 +83,36 @@ export class PostService {
   }
 
   async findAllFilter(findInfo: FindPostDto) {
-    const gerenateNetwork = XFunction.gererateIpNetworkForRedis();
+    // const gerenateNetwork = XFunction.gererateIpNetworkForRedis();
 
-    const keyRedis = `${gerenateNetwork[0]}_${findInfo.languageCode}_${findInfo.limit}_${findInfo.page}_${findInfo.tagsId + findInfo.title}`;
+    // const keyRedis = `${gerenateNetwork[0]}_${findInfo.languageCode}_${findInfo.limit}_${findInfo.page}_${findInfo.tagsId + findInfo.title}`;
 
-    const cachedData = await this.cacheService.get(keyRedis);
+    // const cachedData = await this.cacheService.get(keyRedis);
 
-    if (cachedData) return cachedData;
+    // if (cachedData) return cachedData;
 
     const result = await this.postRepository.findAllFilter(findInfo);
 
-    await this.cacheService.set(keyRedis, result, 10);
+    // await this.cacheService.set(keyRedis, result, 10);
 
     return result;
   }
 
   async findById(id: number, language: string) {
-    const gerenateNetwork = XFunction.gererateIpNetworkForRedis();
+    // const gerenateNetwork = XFunction.gererateIpNetworkForRedis();
     const resultEntity = await this.postRepository.findById(id, language);
 
-    const keyRedis = `${gerenateNetwork[0]}_${id}`;
+    // const keyRedis = `${gerenateNetwork[0]}_${id}`;
 
-    const cachedData = await this.cacheService.get(keyRedis);
+    // const cachedData = await this.cacheService.get(keyRedis);
 
-    if (cachedData) {
-      const resultConvertToDto = XFunction.convertEntityTo(
-        cachedData,
-        PostResponseDto,
-      );
-      return resultConvertToDto;
-    }
+    // if (cachedData) {
+    //   const resultConvertToDto = XFunction.convertEntityTo(
+    //     cachedData,
+    //     PostResponseDto,
+    //   );
+    //   return resultConvertToDto;
+    // }
 
     const resultConvertToDto = XFunction.convertEntityTo(
       resultEntity,

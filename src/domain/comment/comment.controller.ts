@@ -54,7 +54,7 @@ export class CommentController {
   }
 
   @PublicAuth()
-  @Get()
+  @Post('find-all')
   async findCommentOfPost(@Body() findCommentInfo: FindCommentDto) {
     try {
       const result =

@@ -4,6 +4,11 @@ import { IsEmail, IsOptional, IsString } from 'class-validator';
 export class UserDto {
   @IsEmail()
   @IsOptional()
+  @Expose({ name: 'id' })
+  id: number;
+
+  @IsEmail()
+  @IsOptional()
   @Expose({ name: 'email' })
   email: string;
 

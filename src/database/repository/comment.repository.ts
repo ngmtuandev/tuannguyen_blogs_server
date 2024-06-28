@@ -7,18 +7,19 @@ export class CommentRepository extends GenericRepository<CommentEntity> {
   protected repository: Repository<CommentEntity>;
   protected entityManager: EntityManager;
 
-  constructor(dataSource: DataSource, entityManager: EntityManager) {
-    super(dataSource);
-    this.entityManager = entityManager;
-  }
+  // constructor(dataSource: DataSource, entityManager: EntityManager) {
+  //   super(dataSource);
+  //   this.entityManager = entityManager;
+  // }
   getEntityType(): EntityTarget<CommentEntity> {
     return CommentEntity;
   }
 
-  async create(commentInfo: any) {
+  async create(transactionManager: EntityManager, commentInfo: any) {
     let response = undefined;
     try {
-      const result = await this.repository.save(commentInfo);
+      const newComment = transactionManager.create(CommentEntity, commentInfo);
+      const result = await transactionManager.save(CommentEntity, newComment);
       response = result;
     } catch (error) {
       response = undefined;
@@ -30,6 +31,7 @@ export class CommentRepository extends GenericRepository<CommentEntity> {
     const comments = await this.repository
       .createQueryBuilder('c')
       .leftJoinAndSelect('c.post', 'p')
+      .leftJoinAndSelect('c.user', 'u')
       .where('p.id = :postId', { postId })
       .andWhere('c.parentId = :parentId', { parentId })
       .getMany();
@@ -50,7 +52,7 @@ export class CommentRepository extends GenericRepository<CommentEntity> {
     const findCommentHandleLike = await this.findCommentById(commentId);
     if (findCommentHandleLike) {
       await this.repository.update(commentId, {
-        like: +findCommentHandleLike[0].like + 1,
+        like: +findCommentHandleLike.like + 1,
       });
       response = true;
     }
