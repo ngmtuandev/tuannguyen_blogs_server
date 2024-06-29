@@ -29,8 +29,9 @@ export class NotificationRepository extends GenericRepository<NotificationEntity
         user: {
           id: userId,
         },
+        isRead: false,
       },
-      relations: ['user', 'comment'],
+      relations: ['user', 'comment', 'post'],
     });
     return result;
   }
@@ -40,6 +41,7 @@ export class NotificationRepository extends GenericRepository<NotificationEntity
       where: { id: notificationId },
       relations: ['user', 'comment'],
     });
+    await this.repository.update(notificationId, { isRead: true });
     return result;
   }
 }

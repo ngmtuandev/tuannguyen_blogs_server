@@ -70,7 +70,8 @@ export class CommentService {
           message: `Bạn có thông báo từ ${user.email} của bài đăng ${post.id}`,
           user: findComment.user,
           comment: findComment,
-          postId: post.id
+          postId: post.id,
+          post: post,
         });
 
         await this.notificationRepository.create(

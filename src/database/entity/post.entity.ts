@@ -6,6 +6,7 @@ import { TagEntity } from './tag.entity';
 import { EmotionEntity } from './emotion.entity';
 import { PostEmotionEntity } from './post-emotion.entity';
 import { CommentEntity } from './comment.entity';
+import { NotificationEntity } from './notification.entity';
 
 @Entity()
 export class PostEntity extends GenericEntity {
@@ -29,9 +30,12 @@ export class PostEntity extends GenericEntity {
   @ManyToMany(() => TagEntity, (tag) => tag.posts)
   tags?: TagEntity[];
 
-  @OneToMany(() => PostEmotionEntity, postEmotion => postEmotion.post)
+  @OneToMany(() => PostEmotionEntity, (postEmotion) => postEmotion.post)
   postEmotions: PostEmotionEntity[];
 
   @OneToMany(() => CommentEntity, (comment) => comment.post)
   comment: CommentEntity;
+
+  @OneToMany(() => NotificationEntity, (notification) => notification.comment)
+  notifications: NotificationEntity[];
 }
